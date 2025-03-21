@@ -11,14 +11,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/login', req.url))
 
   if (token && (pathname === '/' || pathname === '/login'))
-    return NextResponse.redirect(new URL('/dashboard', req.url))
+    return NextResponse.redirect(new URL('/product', req.url))
 
   return NextResponse.next()
 }
-const actionRedirect = () => {
-  return
-}
 
 export const config = {
-  matcher: ['/', '/dashboard', '/login'],
+  matcher: ['/', '/product', '/login'],
 }
