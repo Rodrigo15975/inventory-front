@@ -1,14 +1,14 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Dashboard',
+  title: 'Product',
 }
-const Dashboard = () => {
+const Product = () => {
   return (
     <div>
-      <h1>Dashboard</h1>
+      <h1>Product</h1>
     </div>
   )
 }
 
-export default Dashboard
+export default Product
