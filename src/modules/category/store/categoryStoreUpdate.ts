@@ -8,10 +8,6 @@ interface CategoryStoreUpdate {
 
 export const useCategoryStoreUpdate = create<CategoryStoreUpdate>((set) => ({
   updateCategory: (dataUpdateCategory) => {
-    console.log({
-      dataUpdateCategory,
-    })
-
     set({
       dataUpdateCategory,
     })

@@ -54,7 +54,7 @@ export const useLogout = () => {
       })
     },
     onError(error: AxiosError) {
-      console.log(error)
+      console.error(error)
 
       toast({
         title: 'Error al cerrar sesión',

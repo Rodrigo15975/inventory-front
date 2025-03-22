@@ -75,10 +75,6 @@ export default function CategoryManagement() {
     const findedCategory = categoriesData?.data.find(
       (category) => category.id === id
     ) as UpdateCategory
-    console.log({
-      findedCategory,
-      id,
-    })
     categoryStoreUpdate.updateCategory(findedCategory)
   }
   const handledToggleRemove = (id: string) => removeCategory(id)

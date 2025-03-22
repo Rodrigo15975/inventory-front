@@ -86,7 +86,7 @@ export const useCreateCategory = () => {
       const { message: description } = error.response?.data as {
         message: string
       }
-      console.log({
+      console.error({
         error,
       })
 
@@ -119,7 +119,7 @@ export const useUpdateCategory = () => {
       const { message: description } = error.response?.data as {
         message: string
       }
-      console.log({
+      console.error({
         error,
       })
       toast({
@@ -147,7 +147,7 @@ export const useDeleteCategory = () => {
       const { message: description } = error.response?.data as {
         message: string
       }
-      console.log({
+      console.error({
         error,
       })
       toast({
