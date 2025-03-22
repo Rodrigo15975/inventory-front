@@ -14,9 +14,7 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
   const now = Math.floor(Date.now() / 1000)
 
-  // console.log({ exp, token, pathname })
-
-  if (!token && pathname === '/login') return NextResponse.next()
+  if (pathname === '/') return NextResponse.redirect(new URL('/login', req.url))
 
   if (!token && pathname !== '/login')
     return NextResponse.redirect(new URL('/login', req.url))
@@ -35,5 +33,14 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/product', '/login', '/category', '/proveedor'],
+  matcher: [
+    '/',
+    '/product',
+    '/category',
+    '/proveedor',
+    '/entry',
+    '/exit',
+    '/kardex',
+    '/login',
+  ],
 }

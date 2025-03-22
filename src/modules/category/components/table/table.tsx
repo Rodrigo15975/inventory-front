@@ -63,10 +63,11 @@ export default function CategoryManagement() {
     totalPages,
   } = usePaginatioCategories()
 
-  const handleToggleActive = (id: string, isActive?: boolean) => {
+  const handleToggleActive = (id: string, isActive: boolean) => {
     const findedCategory = categoriesData?.data.find(
       (category) => category.id === id
     )
+
     updateCategory({ ...findedCategory, is_active: !isActive })
   }
   const disabledModelEdits = isPendingUpdate || isPendingRemove
@@ -146,7 +147,7 @@ export default function CategoryManagement() {
                             <DropdownMenuItem
                               disabled={disabledModelEdits}
                               onClick={() => {
-                                handleToggleActive(id)
+                                handleToggleActive(id, is_active)
                                 setOpenMenuId(null)
                               }}
                             >
