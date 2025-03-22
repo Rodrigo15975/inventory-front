@@ -14,13 +14,13 @@ export default function RootLayout({
         <NextTopLoader
           color="#10B981"
           initialPosition={0.08}
-          crawlSpeed={200}
-          height={5}
+          crawlSpeed={400}
+          height={3}
           crawl={true}
           showSpinner={true}
           easing="ease"
-          speed={500}
-          zIndex={999999999}
+          speed={200}
+          zIndex={9999999999999}
           showAtBottom={false}
         />
         <ProviderQueryClient>
