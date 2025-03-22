@@ -11,12 +11,24 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from '@/components/ui/sidebar'
-import { cn } from '@/lib/utils'
-import { menuItems } from './links-sidebar'
-import ValleLogo from '../logo/logo'
+import { useLogout } from '@/modules/login/services/mutation'
+import { LogOut } from 'lucide-react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import ValleLogo from '../logo/logo'
+import { Button } from '../ui/button'
+import { menuItems } from './links-sidebar'
 
 const AppSidebar = () => {
+  const path = usePathname()
+
+  const { mutate: handleLogout, isPending } = useLogout()
+
+  const isActive = (href: string) =>
+    path === href
+      ? 'bg-emerald-500 text-white transition hover:bg-emerald-600 hover:text-white'
+      : ''
+
   return (
     <Sidebar className="border-r">
       <SidebarHeader className="border-b">
@@ -30,19 +42,15 @@ const AppSidebar = () => {
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {section.items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
+                {section.items.map(({ href, title, icon: Icon }) => (
+                  <SidebarMenuItem key={title}>
                     <SidebarMenuButton
                       asChild
-                      isActive={item.active}
-                      className={cn(
-                        item.active &&
-                          'bg-emerald-500 text-white hover:bg-emerald-600 hover:text-white'
-                      )}
+                      className={`${isActive(href)} h-[42px]`}
                     >
-                      <Link href={item.href}>
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
+                      <Link className="p-4" href={href}>
+                        <Icon className="h-4 w-4" />
+                        <span>{title}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -52,6 +60,20 @@ const AppSidebar = () => {
           </SidebarGroup>
         ))}
       </SidebarContent>
+
+      <div className="p-4 border-t">
+        <Button
+          type="button"
+          variant={'outline'}
+          onClick={() => handleLogout()}
+          disabled={isPending}
+          className="flex items-center justify-center gap-2 p-2 w-full text-primary  bg-[#10B981]/5 rounded-md hover:bg-[#10B981] transition"
+        >
+          <LogOut className="h-4 w-4" />
+          <span>Logout</span>
+        </Button>
+      </div>
+
       <SidebarRail />
     </Sidebar>
   )

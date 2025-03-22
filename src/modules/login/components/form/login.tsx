@@ -17,6 +17,7 @@ import { formSchema } from './schema/schema'
 import { Login as TypeLogin } from '../../types/login.type'
 import { useAuthLogin } from '../../services/mutation'
 import { LogInIcon } from 'lucide-react'
+import ValleLogo from '@/components/logo/logo'
 
 const Login = () => {
   const { isPending, mutate: authLogin } = useAuthLogin()
@@ -33,11 +34,7 @@ const Login = () => {
   return (
     <div className="w-full max-w-md flex flex-col items-center">
       <div className="mb-8">
-        <img
-          src="/images/valle-logo.svg"
-          alt="Valle Alimentos"
-          className="w-28 h-auto"
-        />
+        <ValleLogo />
       </div>
 
       <div className="w-full">

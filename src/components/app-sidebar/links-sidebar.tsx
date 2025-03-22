@@ -13,17 +13,17 @@ export const menuItems = [
       {
         title: 'Entradas',
         icon: ShoppingBag,
-        href: '#',
+        href: '/entry',
       },
       {
         title: 'Salidas',
         icon: ShoppingBag,
-        href: '#',
+        href: '/exit',
       },
       {
         title: 'Kardex',
         icon: BarChart3,
-        href: '#',
+        href: '/kardex',
       },
     ],
   },
@@ -33,23 +33,22 @@ export const menuItems = [
       {
         title: 'Productos',
         icon: Package,
-        href: 'product',
-        active: true,
+        href: '/product',
       },
       {
         title: 'Categorías',
         icon: Tag,
-        href: '#',
+        href: '/category',
       },
       {
         title: 'Proveedor',
         icon: Truck,
-        href: '#',
+        href: '/proveedor',
       },
       {
         title: 'Usuarios',
         icon: Users,
-        href: 'user',
+        href: '/user',
       },
     ],
   },

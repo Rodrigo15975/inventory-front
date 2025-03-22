@@ -5,10 +5,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 const Profile = () => {
   const { data, isLoading } = useGetProfile()
-  console.log({
-    data,
-  })
-
   return (
     <>
       {isLoading ? (
