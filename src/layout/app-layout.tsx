@@ -12,7 +12,7 @@ export const AppLayout: FC<PropsWithChildren> = ({ children }) => {
       <SidebarInset className="flex flex-col">
         <Navbar />
         <main className="flex-1 p-6">
-          <div className="rounded-lg border border-dashed p-8 text-center">
+          <div className="rounded-lg  border-dashed p-8 text-center">
             {children}
           </div>
         </main>

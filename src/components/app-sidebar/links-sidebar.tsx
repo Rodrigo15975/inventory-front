@@ -5,6 +5,7 @@ import {
   Tag,
   Truck,
   Users,
+  PackageSearch,
 } from 'lucide-react'
 export const menuItems = [
   {
@@ -49,6 +50,11 @@ export const menuItems = [
         title: 'Usuarios',
         icon: Users,
         href: '/user',
+      },
+      {
+        title: 'Tipos',
+        icon: PackageSearch,
+        href: '/tipos',
       },
     ],
   },
