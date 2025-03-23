@@ -70,7 +70,7 @@ const AppSidebar = () => {
           className="flex items-center justify-center gap-2 p-2 w-full text-primary  bg-[#10B981]/5 rounded-md hover:bg-[#10B981] transition"
         >
           <LogOut className="h-4 w-4" />
-          <span>Logout</span>
+          <span>Salir</span>
         </Button>
       </div>
 

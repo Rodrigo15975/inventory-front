@@ -1,3 +1,4 @@
+import PageProduct from '@/modules/product/pages/page.product'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -5,9 +6,9 @@ export const metadata: Metadata = {
 }
 const Product = () => {
   return (
-    <div>
-      <h1>Product</h1>
-    </div>
+    <>
+      <PageProduct />
+    </>
   )
 }
 
