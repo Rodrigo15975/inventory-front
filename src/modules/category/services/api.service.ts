@@ -15,7 +15,7 @@ export const createCategory = async (data: CreateCategory) =>
     `${CATEGORY}/create`,
     data
   )
-export const updateCategory = async (data: UpdateCategory, id: string) =>
+export const updateCategory = async (data: UpdateCategory, id: string ) =>
   methodsAxios.PATCH<ApiResponse<Category['data'][0]>, UpdateCategory>(
     `${CATEGORY}/update/${id}`,
     data

@@ -41,14 +41,15 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useGetAllTypeProduct } from '../services/queries.service'
+import { CreateTypeProduct, UpdateTypeProduct } from '../types/type-production'
+import {
+  useCreateTypePorudct,
+  useDeleteTypePorudct,
+  useUpdateTypePorudct,
+} from '../services/mutation.service'
+import { SkeletonTable } from '../../components/skeleton'
 
-// Define the data type
-interface TypeProduct {
-  id: string
-  name: string
-}
-
-// Define the form schema
 const formSchema = z.object({
   name: z.string().min(2, {
     message: 'El nombre debe tener al menos 2 caracteres.',
@@ -56,59 +57,61 @@ const formSchema = z.object({
 })
 
 export function TypeProductTable() {
-  const [open, setOpen] = useState(false)
-  const [products, setProducts] = useState<TypeProduct[]>([
-    { id: '1', name: 'Bebida' },
-    { id: '2', name: 'Alimento' },
-    { id: '3', name: 'Limpieza' },
-  ])
+  const [open, setOpen] = useState<boolean>(false)
+  const [editingItem, setEditingItem] = useState<UpdateTypeProduct | null>(null)
 
-  // Añadir un nuevo estado para el elemento que se está editando
-  const [editingItem, setEditingItem] = useState<TypeProduct | null>(null)
+  const { data: typeProducts = [], isLoading: isLoadingTypeProduct } =
+    useGetAllTypeProduct()
 
-  // Define form
-  const form = useForm<z.infer<typeof formSchema>>({
+  const { mutate: createTypeProduct, isPending: isPendingCreateTypeProduct } =
+    useCreateTypePorudct()
+
+  const { mutate: deleteTypePorudct, isPending: isPendingDeleteTypeProduct } =
+    useDeleteTypePorudct()
+
+  const { mutate: updateTypeProduct, isPending: isPendingUpdateTypeProduct } =
+    useUpdateTypePorudct()
+
+  const disableButton =
+    isPendingCreateTypeProduct ||
+    isPendingDeleteTypeProduct ||
+    isPendingUpdateTypeProduct
+
+  const form = useForm<CreateTypeProduct>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
     },
   })
 
-  // Modificar la función onSubmit para manejar tanto la creación como la edición
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    if (editingItem) {
-      // Actualizar tipo de producto existente
-      setProducts(
-        products.map((item) =>
-          item.id === editingItem.id ? { ...item, name: values.name } : item
-        )
+  const onSubmit = (values: CreateTypeProduct) => {
+    if (editingItem)
+      return updateTypeProduct(
+        { id: editingItem.id, name: values.name },
+        {
+          onSuccess: () => {
+            form.reset()
+            setEditingItem(null)
+            setOpen(false)
+          },
+        }
       )
-    } else {
-      // Añadir nuevo tipo de producto
-      const newProduct = {
-        id: Math.random().toString(36).substring(2, 9),
-        name: values.name,
-      }
-
-      setProducts([...products, newProduct])
-    }
-
-    // Reset form, clear editing state and close dialog
-    form.reset()
-    setEditingItem(null)
-    setOpen(false)
+    createTypeProduct(values, {
+      onSuccess: () => {
+        form.reset()
+        setEditingItem(null)
+        setOpen(false)
+      },
+    })
   }
 
-  // Añadir función para iniciar la edición
-  function handleEdit(product: TypeProduct) {
+  const handleEdit = (product: UpdateTypeProduct) => {
     setEditingItem(product)
-    form.setValue('name', product.name)
+    form.setValue('name', product?.name ?? 'no product type')
     setOpen(true)
   }
 
-  function handleDelete(id: string) {
-    setProducts(products.filter((item) => item.id !== id))
-  }
+  const handleDelete = (id: string) => deleteTypePorudct(id)
 
   return (
     <Card>
@@ -119,55 +122,61 @@ export function TypeProductTable() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nombre</TableHead>
-              <TableHead className="w-[100px] text-right">Acciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {products.length === 0 ? (
+        {isLoadingTypeProduct ? (
+          <SkeletonTable columns={['Nombre', 'Acciones']} />
+        ) : (
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell
-                  colSpan={2}
-                  className="text-center text-muted-foreground"
-                >
-                  No hay tipos de producto
-                </TableCell>
+                <TableHead>Nombre</TableHead>
+                <TableHead className="w-[100px] text-right">Acciones</TableHead>
               </TableRow>
-            ) : (
-              products.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell>{product.name}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEdit(product)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(product.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+            </TableHeader>
+            <TableBody>
+              {typeProducts.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={2}
+                    className="text-center text-muted-foreground"
+                  >
+                    No hay tipos de producto
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                typeProducts.map((product) => (
+                  <TableRow key={product.id}>
+                    <TableCell>{product.name}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(product)}
+                          disabled={disableButton}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(product.id)}
+                          disabled={disableButton}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        )}
       </CardContent>
       <CardFooter>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="ml-auto">
+            <Button className="ml-auto" disabled={disableButton}>
               <Plus className="mr-2 h-4 w-4" />
               Nuevo Tipo
             </Button>
@@ -205,7 +214,9 @@ export function TypeProductTable() {
                   )}
                 />
                 <DialogFooter>
-                  <Button type="submit">Guardar</Button>
+                  <Button type="submit" disabled={disableButton}>
+                    Guardar
+                  </Button>
                 </DialogFooter>
               </form>
             </Form>

@@ -11,9 +11,7 @@ const Profile = () => {
         <Skeleton className="h-8 w-8" />
       ) : (
         <>
-          <div className="text-sm font-medium">
-            {data?.name.toUpperCase() ?? 'Name'}
-          </div>
+          <div className="text-sm font-medium">{data?.name || 'Name'}</div>
           <Avatar className="h-8 flex items-center justify-center w-8">
             <AvatarImage
               src="/placeholder.svg?height=32&width=32"
