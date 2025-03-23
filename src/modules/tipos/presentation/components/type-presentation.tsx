@@ -41,14 +41,18 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useGetAllTypePresentation } from '../services/queries.service'
+import {
+  CreateTypePresentation,
+  UpdateTypePresentation,
+} from '../types/type-presentation'
+import {
+  useCreateTypePresentation,
+  useDeleteTypePresentation,
+  useUpdateTypePresentation,
+} from '../services/mutation.service'
+import { SkeletonTable } from '../../components/skeleton'
 
-// Define the data type
-interface TypePresentation {
-  id: string
-  name: string
-}
-
-// Define the form schema
 const formSchema = z.object({
   name: z.string().min(2, {
     message: 'El nombre debe tener al menos 2 caracteres.',
@@ -56,57 +60,66 @@ const formSchema = z.object({
 })
 
 export function TypePresentationTable() {
-  const [open, setOpen] = useState(false)
-  const [presentations, setPresentations] = useState<TypePresentation[]>([
-    { id: '1', name: 'Botella' },
-    { id: '2', name: 'Caja' },
-    { id: '3', name: 'Paquete' },
-  ])
+  const [open, setOpen] = useState<boolean>(false)
+  const {
+    data: typePresentations = [],
+    isLoading: isLoadingTypePresentations,
+  } = useGetAllTypePresentation()
+  const {
+    mutate: createTypePresentation,
+    isPending: isPendingTypePresentation,
+  } = useCreateTypePresentation()
+  const {
+    mutate: updateTypePresentation,
+    isPending: isPendingUpdateTypePresentation,
+  } = useUpdateTypePresentation()
 
-  // Añadir un nuevo estado para el elemento que se está editando
-  const [editingItem, setEditingItem] = useState<TypePresentation | null>(null)
+  const {
+    mutate: deleteTypePresentation,
+    isPending: isPendingDeleteTypePresentation,
+  } = useDeleteTypePresentation()
 
-  // Define form
-  const form = useForm<z.infer<typeof formSchema>>({
+  const [editingItem, setEditingItem] = useState<UpdateTypePresentation | null>(
+    null
+  )
+  const disabledButton =
+    isPendingTypePresentation ||
+    isPendingUpdateTypePresentation ||
+    isPendingDeleteTypePresentation
+
+  const form = useForm<CreateTypePresentation>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
     },
   })
 
-  // Modificar la función onSubmit para manejar tanto la creación como la edición
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    if (editingItem) {
-      // Actualizar presentación existente
-      setPresentations(
-        presentations.map((item) =>
-          item.id === editingItem.id ? { ...item, name: values.name } : item
-        )
+  const onSubmit = (values: CreateTypePresentation) => {
+    if (editingItem)
+      return updateTypePresentation(
+        { id: editingItem.id, name: values.name },
+        {
+          onSuccess: () => {
+            form.reset()
+            setEditingItem(null)
+            setOpen(false)
+          },
+        }
       )
-    } else {
-      // Añadir nueva presentación
-      const newPresentation = {
-        id: Math.random().toString(36).substring(2, 9),
-        name: values.name,
-      }
 
-      setPresentations([...presentations, newPresentation])
-    }
-
-    // Reset form, clear editing state and close dialog
-    form.reset()
-    setEditingItem(null)
-    setOpen(false)
+    createTypePresentation(values, {
+      onSuccess: () => {
+        form.reset()
+        setOpen(false)
+      },
+    })
   }
 
-  function handleDelete(id: string) {
-    setPresentations(presentations.filter((item) => item.id !== id))
-  }
+  const handleDelete = (id: string) => deleteTypePresentation(id)
 
-  // Añadir función para iniciar la edición
-  function handleEdit(presentation: TypePresentation) {
+  const handleEdit = (presentation: UpdateTypePresentation) => {
     setEditingItem(presentation)
-    form.setValue('name', presentation.name)
+    form.setValue('name', presentation?.name ?? '')
     setOpen(true)
   }
 
@@ -119,50 +132,56 @@ export function TypePresentationTable() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nombre</TableHead>
-              <TableHead className="w-[100px] text-right">Acciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {presentations.length === 0 ? (
+        {isLoadingTypePresentations ? (
+          <SkeletonTable columns={['Nombre', 'Acciones']} />
+        ) : (
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell
-                  colSpan={2}
-                  className="text-center text-muted-foreground"
-                >
-                  No hay tipos de presentación
-                </TableCell>
+                <TableHead>Nombre</TableHead>
+                <TableHead className="w-[100px] text-right">Acciones</TableHead>
               </TableRow>
-            ) : (
-              presentations.map((presentation) => (
-                <TableRow key={presentation.id}>
-                  <TableCell>{presentation.name}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEdit(presentation)}
-                      >
-                        <Pencil className="h-4 w-4 " />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(presentation.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+            </TableHeader>
+            <TableBody>
+              {typePresentations?.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={2}
+                    className="text-center text-muted-foreground"
+                  >
+                    No hay tipos de presentación
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                typePresentations?.map((presentation) => (
+                  <TableRow key={presentation.id}>
+                    <TableCell>{presentation.name}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(presentation)}
+                          disabled={disabledButton}
+                        >
+                          <Pencil className="h-4 w-4 " />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          disabled={disabledButton}
+                          onClick={() => handleDelete(presentation.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        )}
       </CardContent>
       <CardFooter>
         <Dialog open={open} onOpenChange={setOpen}>
@@ -211,7 +230,9 @@ export function TypePresentationTable() {
                   )}
                 />
                 <DialogFooter>
-                  <Button type="submit">Guardar</Button>
+                  <Button type="submit" disabled={disabledButton}>
+                    {disabledButton ? 'Guardando...' : 'Guardar'}
+                  </Button>
                 </DialogFooter>
               </form>
             </Form>

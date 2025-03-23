@@ -47,15 +47,22 @@ const Formulario = () => {
 
   const onSubmit = (data: CreateCategory) => {
     const { id } = dataUpdateCategory
-    if (dataUpdateCategory)
+    console.log({
+      dataUpdateCategory,
+      data,
+    })
+
+    if (dataUpdateCategory.id)
       return updateCategory(
         {
-          ...data,
+          name: data.name,
+          description: data.description,
           id,
         },
         {
           onSuccess: () => {
             clearForm()
+            form.reset()
           },
         }
       )
