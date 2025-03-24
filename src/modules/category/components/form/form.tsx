@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { BadgePlus, Trash } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -47,11 +46,6 @@ const Formulario = () => {
 
   const onSubmit = (data: CreateCategory) => {
     const { id } = dataUpdateCategory
-    console.log({
-      dataUpdateCategory,
-      data,
-    })
-
     if (dataUpdateCategory.id)
       return updateCategory(
         {

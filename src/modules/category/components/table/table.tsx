@@ -67,7 +67,6 @@ export default function CategoryManagement() {
     const findedCategory = categoriesData?.data.find(
       (category) => category.id === id
     )
-
     updateCategory({ ...findedCategory, is_active: !isActive })
   }
   const disabledModelEdits = isPendingUpdate || isPendingRemove
