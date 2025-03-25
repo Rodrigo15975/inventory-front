@@ -116,7 +116,10 @@ export function TypePresentationTable() {
   }
 
   const handleDelete = (id: string) => deleteTypePresentation(id)
-
+  const clearActionEdit = () => {
+    setEditingItem(null)
+    form.reset()
+  }
   const handleEdit = (presentation: UpdateTypePresentation) => {
     setEditingItem(presentation)
     form.setValue('name', presentation?.name ?? '')
@@ -155,7 +158,9 @@ export function TypePresentationTable() {
               ) : (
                 typePresentations?.map((presentation) => (
                   <TableRow key={presentation.id}>
-                    <TableCell>{presentation.name}</TableCell>
+                    <TableCell className="text-start">
+                      {presentation.name}
+                    </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <Button
@@ -186,13 +191,7 @@ export function TypePresentationTable() {
       <CardFooter>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button
-              className="ml-auto"
-              onClick={() => {
-                setEditingItem(null)
-                form.reset()
-              }}
-            >
+            <Button onClick={clearActionEdit} className="ml-auto bg-[#3b82f6]">
               <Plus className="mr-2 h-4 w-4" />
               Nuevo Tipo
             </Button>
@@ -200,7 +199,7 @@ export function TypePresentationTable() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
-                {editingItem
+                {editingItem?.id
                   ? 'Editar Tipo de Presentación'
                   : 'Crear Tipo de Presentación'}
               </DialogTitle>
@@ -230,7 +229,11 @@ export function TypePresentationTable() {
                   )}
                 />
                 <DialogFooter>
-                  <Button type="submit" disabled={disabledButton}>
+                  <Button
+                    type="submit"
+                    className="bg-[#3b82f6]"
+                    disabled={disabledButton}
+                  >
                     {disabledButton ? 'Guardando...' : 'Guardar'}
                   </Button>
                 </DialogFooter>

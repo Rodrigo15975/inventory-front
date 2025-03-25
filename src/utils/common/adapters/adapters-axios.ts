@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
-import { API } from '../path-services'
+import { API } from '../../path-services'
 
 const axiosAdapter: AxiosInstance = axios.create({
   baseURL: API,

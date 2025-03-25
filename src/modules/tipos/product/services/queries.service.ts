@@ -5,6 +5,6 @@ export const useGetAllTypeProduct = () =>
   useQuery({
     queryKey: ['type-product'],
     queryFn: getAllTypeProduct,
-    gcTime: 200000,
-    staleTime: 200000,
+    gcTime: 1800000, // 30 minutos en milisegundos
+    staleTime: 1800000, // 30 minutos en milisegundos
   })

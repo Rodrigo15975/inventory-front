@@ -1,9 +1,9 @@
-import Profile from '../components/profile'
+import TableUser from '../components/table/table'
 
 const PageUser = () => {
   return (
     <>
-      <Profile />
+      <TableUser />
     </>
   )
 }

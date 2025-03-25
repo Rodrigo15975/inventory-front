@@ -1,6 +1,6 @@
 'use client'
-import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
-import { useGetProfile } from '../services/queries'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useGetProfile } from '../services/queries.service'
 import { Skeleton } from '@/components/ui/skeleton'
 
 const Profile = () => {
@@ -13,10 +13,7 @@ const Profile = () => {
         <>
           <div className="text-sm font-medium">{data?.name || 'Name'}</div>
           <Avatar className="h-8 flex items-center justify-center w-8">
-            <AvatarImage
-              src="/placeholder.svg?height=32&width=32"
-              alt="@usuario"
-            />
+            <AvatarImage alt="@usuario" />
             <AvatarFallback>U</AvatarFallback>
           </Avatar>
         </>

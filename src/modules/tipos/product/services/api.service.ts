@@ -1,6 +1,6 @@
 import { ApiResponse } from '@/utils/api.response'
 import { methodsAxios } from '@/utils/common/adapters/adapters-axios'
-import { TYPE_PRODUCT } from '@/utils/common/path-services'
+import { TYPE_PRODUCT } from '@/utils/path-services'
 import {
   CreateTypeProduct,
   TypeProduct,

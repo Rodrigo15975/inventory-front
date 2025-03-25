@@ -24,7 +24,7 @@ const Login = () => {
   const form = useForm<TypeLogin>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
+      username: '',
       password: '',
       rememberPassword: false,
     },
@@ -50,10 +50,10 @@ const Login = () => {
         >
           <FormField
             control={form.control}
-            name="name"
+            name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Usuario</FormLabel>
+                <FormLabel>Username</FormLabel>
                 <FormControl>
                   <Input {...field} className="w-full focus:!ring-[#10B981]" />
                 </FormControl>

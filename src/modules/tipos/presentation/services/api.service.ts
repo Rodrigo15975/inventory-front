@@ -1,6 +1,6 @@
 import { ApiResponse } from '@/utils/api.response'
 import { methodsAxios } from '@/utils/common/adapters/adapters-axios'
-import { TYPE_PRESENTATION } from '@/utils/common/path-services'
+import { TYPE_PRESENTATION } from '@/utils/path-services'
 import {
   CreateTypePresentation,
   TypePresentation,

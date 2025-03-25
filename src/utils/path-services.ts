@@ -5,7 +5,19 @@ const PATH_SERVICES = {
   CATEGORY: '/categorie',
   TYPE_PRODUCT: '/type-product',
   TYPE_PRESENTATION: '/type-presentation',
+  ROLES: '/roles',
+  USER: '/user',
+  PRODUCT: '/product',
 } as const
 
-export const { API, AUTH, PROFILE, CATEGORY, TYPE_PRESENTATION, TYPE_PRODUCT } =
-  PATH_SERVICES
+export const {
+  API,
+  PRODUCT,
+  USER,
+  AUTH,
+  ROLES,
+  PROFILE,
+  CATEGORY,
+  TYPE_PRESENTATION,
+  TYPE_PRODUCT,
+} = PATH_SERVICES

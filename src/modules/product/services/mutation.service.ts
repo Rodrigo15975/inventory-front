@@ -1,0 +1,52 @@
+import { useToast } from '@/hooks/use-toast'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { createProduct, updateProduct } from './api.service'
+import { CreateProduct, UpdateProduct } from '../types/type.product'
+import { AxiosError } from 'axios'
+
+export const useCreateProduct = () => {
+  const queryClient = useQueryClient()
+  const { toast } = useToast()
+  return useMutation({
+    mutationKey: ['create-product'],
+    mutationFn: (data: CreateProduct) => createProduct(data),
+    onSuccess: async (newData) => {
+      const { message: description } = newData
+      await queryClient.invalidateQueries({ queryKey: ['products'] })
+      toast({ title: 'Producto', description })
+    },
+    onError: (error: AxiosError) => {
+      const { message: description } = error.response?.data as {
+        message: string
+      }
+      toast({
+        title: 'Product',
+        variant: 'destructive',
+        description: description || 'Error al crear la categoría',
+      })
+    },
+  })
+}
+export const useUpdateProduct = () => {
+  const queryClient = useQueryClient()
+  const { toast } = useToast()
+  return useMutation({
+    mutationKey: ['update-product'],
+    mutationFn: (data: UpdateProduct) => updateProduct(data),
+    onSuccess: async (newData) => {
+      const { message: description } = newData
+      await queryClient.invalidateQueries({ queryKey: ['products'] })
+      toast({ title: 'Producto', description })
+    },
+    onError: (error: AxiosError) => {
+      const { message: description } = error.response?.data as {
+        message: string
+      }
+      toast({
+        title: 'Product',
+        variant: 'destructive',
+        description: description || 'Error al crear la categoría',
+      })
+    },
+  })
+}

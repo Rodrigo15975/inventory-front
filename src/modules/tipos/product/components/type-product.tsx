@@ -107,10 +107,13 @@ export function TypeProductTable() {
 
   const handleEdit = (product: UpdateTypeProduct) => {
     setEditingItem(product)
-    form.setValue('name', product?.name ?? 'no product type')
+    form.setValue('name', product?.name ?? '')
     setOpen(true)
   }
-
+  const clearActionEdit = () => {
+    setEditingItem(null)
+    form.reset()
+  }
   const handleDelete = (id: string) => deleteTypePorudct(id)
 
   return (
@@ -145,7 +148,7 @@ export function TypeProductTable() {
               ) : (
                 typeProducts.map((product) => (
                   <TableRow key={product.id}>
-                    <TableCell>{product.name}</TableCell>
+                    <TableCell className="text-start">{product.name}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <Button
@@ -176,7 +179,11 @@ export function TypeProductTable() {
       <CardFooter>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="ml-auto" disabled={disableButton}>
+            <Button
+              onClick={clearActionEdit}
+              className="ml-auto bg-[#3b82f6]"
+              disabled={disableButton}
+            >
               <Plus className="mr-2 h-4 w-4" />
               Nuevo Tipo
             </Button>
@@ -184,7 +191,7 @@ export function TypeProductTable() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
-                {editingItem
+                {editingItem?.id
                   ? 'Editar Tipo de Producto'
                   : 'Crear Tipo de Producto'}
               </DialogTitle>
@@ -214,7 +221,11 @@ export function TypeProductTable() {
                   )}
                 />
                 <DialogFooter>
-                  <Button type="submit" disabled={disableButton}>
+                  <Button
+                    type="submit"
+                    className="bg-[#3b82f6]"
+                    disabled={disableButton}
+                  >
                     Guardar
                   </Button>
                 </DialogFooter>
