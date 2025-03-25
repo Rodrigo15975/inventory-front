@@ -24,90 +24,159 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { ChevronRight, MoreVertical } from 'lucide-react'
+import { ChevronRight, Edit2, MoreVertical, Trash } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
+import { useGetAllProducts } from '../../services/queries.service'
+import { SkeletonTableGlobal } from '@/components/ui/skeleton.table'
+import { useDataUpdateProduct } from '../../hooks/useDataUpdateProduct'
 
 export function ProductTable() {
-  const products: any[] = []
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(5)
-
-  const totalPages = Math.ceil(products.length / itemsPerPage)
-
-  const currentProducts = products.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+  const [page, setPage] = useState<number>(1)
+  const [size, setSize] = useState<number>(10)
+  const { setUpdateProductData } = useDataUpdateProduct()
+  const { data: products, isLoading: isLoadingProducts } = useGetAllProducts(
+    page,
+    size
   )
+
+  const totalPages = Math.ceil((products?.count || 0) / size)
+
+  const handleNextPage = () => {
+    if (page < totalPages) setPage((prev) => prev + 1)
+  }
+
+  const handlePrevPage = () => {
+    if (page > 1) setPage((prev) => prev - 1)
+  }
+
+  const handledEdit = (id: string) => {
+    const product = products?.data.find((product) => product.id === id)
+    if (!product) return
+    const { category, typeProduct, TypePresentation, name, description } =
+      product
+    setUpdateProductData({
+      categoryId: category.id,
+      typeProductId: typeProduct.id,
+      typePresentationId: TypePresentation.id,
+      id,
+      description: description || '',
+      name,
+      is_active: String(product?.is_active),
+    })
+  }
+  const handledDelete = (id: string) => {}
 
   return (
     <Card className="rounded-md shadow-sm">
       <CardContent className="p-0">
         <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-white hover:bg-white">
-                <TableHead className="w-12">
-                  <Checkbox />
-                </TableHead>
-                <TableHead>Producto</TableHead>
-                <TableHead>Categoría</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Presentación</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead className="text-right">Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {currentProducts.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell>
+          {isLoadingProducts ? (
+            <SkeletonTableGlobal
+              columns={[
+                'Producto',
+                'Categoría',
+                'Tipo',
+                'Presentación',
+                'Descripción',
+                'Estado',
+                'Acciones',
+              ]}
+            />
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-white">
+                  <TableHead className="w-12 text-center">
                     <Checkbox />
-                  </TableCell>
-                  <TableCell>{product.name}</TableCell>
-                  <TableCell>{product.category}</TableCell>
-                  <TableCell>{product.type}</TableCell>
-                  <TableCell>{product.presentation}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <div
-                        className={`w-2 h-2 rounded-full mr-2 ${
-                          product.status === 'active'
-                            ? 'bg-green-500'
-                            : 'bg-orange-500'
-                        }`}
-                      />
-                      {product.status === 'active' ? 'Activo' : 'Inactivo'}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                          <span className="sr-only">Abrir menú</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Editar</DropdownMenuItem>
-                        <DropdownMenuItem>Eliminar</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+                  </TableHead>
+                  <TableHead className="text-center font-bold text-primary">
+                    Producto
+                  </TableHead>
+                  <TableHead className="text-center font-bold text-primary">
+                    Categoría
+                  </TableHead>
+                  <TableHead className="text-center font-bold text-primary">
+                    Tipo
+                  </TableHead>
+                  <TableHead className="text-center font-bold text-primary">
+                    Presentación
+                  </TableHead>
+                  <TableHead className="text-center font-bold text-primary">
+                    Descripción
+                  </TableHead>
+                  <TableHead className="text-center font-bold text-primary">
+                    Estado
+                  </TableHead>
+                  <TableHead className="text-center font-bold text-primary">
+                    Acciones
+                  </TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {products?.data.map((product) => (
+                  <TableRow key={product.id}>
+                    <TableCell>
+                      <Checkbox />
+                    </TableCell>
+                    <TableCell>{product.name}</TableCell>
+                    <TableCell>{product.category.name}</TableCell>
+                    <TableCell>{product.typeProduct.name}</TableCell>
+                    <TableCell>{product.TypePresentation.name}</TableCell>
+                    <TableCell>{product.description}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center justify-center">
+                        <div
+                          className={`w-2 h-2 rounded-full mr-2 ${
+                            product.is_active === true
+                              ? 'bg-green-500'
+                              : 'bg-orange-500'
+                          }`}
+                        />
+                        {product.is_active === true ? 'Activo' : 'Inactivo'}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical className="h-4 w-4" />
+                            <span className="sr-only">Abrir menú</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => handledEdit(product.id)}
+                          >
+                            <Edit2 />
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handledDelete(product.id)}
+                          >
+                            <Trash /> Eliminar
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </div>
 
-        <div className="flex items-center justify-end p-4 ">
+        <div className="flex items-center justify-end p-4">
           <div className="flex items-center space-x-6 text-sm">
             <span>Paginación</span>
             <Select
-              value={itemsPerPage.toString()}
-              onValueChange={(value) => setItemsPerPage(Number(value))}
+              onValueChange={(value) => {
+                setSize(Number(value))
+                setPage(1)
+              }}
+              value={String(size)}
             >
               <SelectTrigger className="w-16">
-                <SelectValue placeholder="5" />
+                <SelectValue placeholder="10" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="5">5</SelectItem>
@@ -117,27 +186,23 @@ export function ProductTable() {
             </Select>
 
             <span className="text-sm text-gray-500">
-              {(currentPage - 1) * itemsPerPage + 1}-
-              {Math.min(currentPage * itemsPerPage, products.length)} de{' '}
-              {products.length}
+              Página {page} de {totalPages || 1}
             </span>
 
             <div className="flex items-center">
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
+                onClick={handlePrevPage}
+                disabled={page === 1}
               >
                 <ChevronRight className="h-4 w-4 rotate-180" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() =>
-                  setCurrentPage(Math.min(totalPages, currentPage + 1))
-                }
-                disabled={currentPage === totalPages}
+                onClick={handleNextPage}
+                disabled={page >= totalPages}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>

@@ -1,20 +1,8 @@
 'use client'
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-import { Card, CardContent } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
+import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   Form,
   FormControl,
@@ -22,56 +10,114 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Loader2 } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { useDataUpdateProduct } from '../../hooks/useDataUpdateProduct'
+import { useGetAllSelectToCreateProducts } from '../../hooks/useGetAllSelectToCreateProducts'
+import {
+  useCreateProduct,
+  useUpdateProduct,
+} from '../../services/mutation.service'
+import { ProductFormValues } from '../../types/type.product'
 import { productFormSchema } from './schema/schema'
 
-type ProductFormValues = z.infer<typeof productFormSchema>
+const initialValues = {
+  name: '',
+  categoryId: '',
+  typeProductId: '',
+  typePresentationId: '',
+  description: '',
+  is_active: '',
+}
 
 export function AddProductForm() {
+  const { getActivesCategories, getAllTypePresentation, getAllTypeProduct } =
+    useGetAllSelectToCreateProducts()
+
+  const { mutate: createProduct, isPending: isPendingCreate } =
+    useCreateProduct()
+  const { mutate: updateProduct, isPending: isPendingUpdate } =
+    useUpdateProduct()
+
+  const { dataProductUpdate, setUpdateProductData } = useDataUpdateProduct()
+
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
-    defaultValues: {
-      name: '',
-      category: '',
-      type: '',
-      presentation: '',
-      description: '',
-      status: '',
-    },
+    defaultValues: initialValues,
   })
 
-  function onSubmit(data: ProductFormValues) {}
+  useEffect(() => {
+    if (dataProductUpdate.id) {
+      form.reset(dataProductUpdate)
+    }
+  }, [dataProductUpdate, form])
+
+  const btnDisabled = isPendingCreate || isPendingUpdate
+
+  const onSubmit = (data: ProductFormValues) => {
+    if (dataProductUpdate?.id)
+      return updateProduct(
+        { ...data, id: dataProductUpdate.id },
+        {
+          onSuccess: () => {
+            clearEdit()
+          },
+        }
+      )
+
+    createProduct(data, {
+      onSuccess: () => {
+        clearEdit()
+      },
+    })
+  }
+
+  const clearEdit = () => {
+    form.reset(initialValues)
+    setUpdateProductData({})
+  }
 
   return (
     <Card className="rounded-md shadow-sm !border-none">
       <CardContent className="pt-6 !border-none">
         <div className="mb-6 text-start">
           <h2 className="text-xl font-medium text-gray-800">
-            Agregar productos
+            {dataProductUpdate?.id ? 'Editar producto' : 'Agregar producto'}
           </h2>
         </div>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="block lg:grid lg:grid-cols-3 gap-6">
               <FormField
                 control={form.control}
-                name="category"
+                name="categoryId"
                 render={({ field }) => (
                   <FormItem className="space-y-2 text-start">
                     <Label htmlFor="category">Categoría</Label>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccionar categoría" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Categoría 1">Categoría 1</SelectItem>
-                        <SelectItem value="Categoría 2">Categoría 2</SelectItem>
-                        <SelectItem value="Categoría 3">Categoría 3</SelectItem>
+                        {getActivesCategories?.data.map((categorie) => (
+                          <SelectItem key={categorie.id} value={categorie.id}>
+                            {categorie.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -81,23 +127,25 @@ export function AddProductForm() {
 
               <FormField
                 control={form.control}
-                name="presentation"
+                name="typePresentationId"
                 render={({ field }) => (
                   <FormItem className="space-y-2 text-start">
                     <Label htmlFor="presentation">Presentación</Label>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccionar presentación" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Saco">Saco</SelectItem>
-                        <SelectItem value="Medio saco">Medio saco</SelectItem>
-                        <SelectItem value="Kilo">Kilo</SelectItem>
+                        {getAllTypePresentation?.map((presentation) => (
+                          <SelectItem
+                            key={presentation.id}
+                            value={presentation.id}
+                          >
+                            {presentation.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -125,23 +173,25 @@ export function AddProductForm() {
 
               <FormField
                 control={form.control}
-                name="type"
+                name="typeProductId"
                 render={({ field }) => (
                   <FormItem className="space-y-2 md:row-start-2 text-start">
                     <Label htmlFor="type">Tipo</Label>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccionar tipo" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Grano">Grano</SelectItem>
-                        <SelectItem value="Polvo">Polvo</SelectItem>
-                        <SelectItem value="Mazorca">Mazorca</SelectItem>
+                        {getAllTypeProduct?.map((typeProduct) => (
+                          <SelectItem
+                            key={typeProduct.id}
+                            value={typeProduct.id}
+                          >
+                            {typeProduct.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -170,22 +220,24 @@ export function AddProductForm() {
 
               <FormField
                 control={form.control}
-                name="status"
+                name="is_active"
                 render={({ field }) => (
                   <FormItem className="space-y-2 md:row-start-3 text-start">
                     <Label htmlFor="status">Estado</Label>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccionar estado" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="active">Activo</SelectItem>
-                        <SelectItem value="inactive">Inactivo</SelectItem>
+                        <SelectItem value="true">Activo</SelectItem>
+                        <SelectItem
+                          disabled={!dataProductUpdate.id && true}
+                          value="false"
+                        >
+                          Inactivo
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -193,9 +245,27 @@ export function AddProductForm() {
                 )}
               />
 
-              <div className="md:col-start-3 md:row-start-3 flex items-end justify-end">
-                <Button type="submit" className="bg-blue-500 hover:bg-blue-600">
-                  Agregar
+              <div className="md:col-start-3 max-lg:pt-4 md:row-start-3 flex items-end gap-4 justify-end">
+                {dataProductUpdate?.id && (
+                  <Button
+                    type="button"
+                    disabled={btnDisabled}
+                    className=" hover:bg-blue-600"
+                    variant={'outline'}
+                    onClick={clearEdit}
+                  >
+                    Cancelar
+                  </Button>
+                )}
+                <Button
+                  type="submit"
+                  disabled={btnDisabled}
+                  className="bg-blue-500 hover:bg-blue-600"
+                >
+                  {btnDisabled && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  {dataProductUpdate?.id ? 'Actualizar' : 'Agregar'}
                 </Button>
               </div>
             </div>

@@ -1,5 +1,5 @@
 import { methodsAxios } from '@/utils/common/adapters/adapters-axios'
-import { AUTH } from '@/utils/common/path-services'
+import { AUTH } from '@/utils/path-services'
 import { Login, ResponseLogin } from '../types/login.type'
 import { ApiResponse } from '@/utils/api.response'
 
