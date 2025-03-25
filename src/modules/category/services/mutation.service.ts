@@ -139,9 +139,6 @@ export const useDeleteCategory = () => {
       const { message: description } = error.response?.data as {
         message: string
       }
-      console.error({
-        error,
-      })
       toast({
         title: 'Categoría',
         description: description || 'Error al remover la categoría',

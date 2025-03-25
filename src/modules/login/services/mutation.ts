@@ -22,7 +22,6 @@ export const useAuthLogin = () => {
       })
     },
     onError(error: AxiosError<{ message: string }>) {
-      console.error(error)
       if (error.message) {
         toast({
           title: `${error.response?.data.message}`,
@@ -54,8 +53,6 @@ export const useLogout = () => {
       })
     },
     onError(error: AxiosError) {
-      console.error(error)
-
       toast({
         title: 'Error al cerrar sesión',
         'aria-activedescendant': error.message,
