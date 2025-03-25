@@ -8,10 +8,12 @@ const PATH_SERVICES = {
   ROLES: '/roles',
   USER: '/user',
   PRODUCT: '/product',
+  PROVEEDOR: '/provider',
 } as const
 
 export const {
   API,
+  PROVEEDOR,
   PRODUCT,
   USER,
   AUTH,
