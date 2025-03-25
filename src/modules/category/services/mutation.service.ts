@@ -80,15 +80,13 @@ export const useCreateCategory = () => {
           ),
         }
       })
+      await queryClient.invalidateQueries({ queryKey: firstQuery })
       toast({ title: 'Categoria', description })
     },
     onError: (error: AxiosError, _, context) => {
       const { message: description } = error.response?.data as {
         message: string
       }
-      console.error({
-        error,
-      })
 
       queryClient.setQueryData(firstQuery, context?.previousCategories)
       toast({
@@ -96,9 +94,6 @@ export const useCreateCategory = () => {
         variant: 'destructive',
         description: description || 'Error al crear la categoría',
       })
-    },
-    onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: firstQuery })
     },
   })
 }
@@ -119,9 +114,6 @@ export const useUpdateCategory = () => {
       const { message: description } = error.response?.data as {
         message: string
       }
-      console.error({
-        error,
-      })
       toast({
         title: 'Categoría',
         description: description || 'Error al actualizar la categoría',
