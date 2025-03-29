@@ -1,11 +1,16 @@
+import PageKardex from '@/modules/kardex/pages/page-kardex'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Entrada',
+  title: 'Kardex',
 }
 
-const PageKardex = () => {
-  return <div>page</div>
+const Page = () => {
+  return (
+    <>
+      <PageKardex />
+    </>
+  )
 }
 
-export default PageKardex
+export default Page
