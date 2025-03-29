@@ -17,6 +17,8 @@ export const updateProduct = async (data: UpdateProduct) =>
     `${PRODUCT}/${data.id}`,
     data
   )
+export const deleteProduct = async (id: String) =>
+  await methodsAxios.DELETE<ApiResponse>(`${PRODUCT}/${id}`)
 
 export const getAllProducts = async (page = 1, size = 20) =>
   await methodsAxios.GET<GetAllProducts>(`${PRODUCT}?page=${page}&size=${size}`)

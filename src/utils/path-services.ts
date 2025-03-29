@@ -9,10 +9,12 @@ const PATH_SERVICES = {
   USER: '/user',
   PRODUCT: '/product',
   PROVEEDOR: '/provider',
+  MOVEMENTS: '/movements',
 } as const
 
 export const {
   API,
+  MOVEMENTS,
   PROVEEDOR,
   PRODUCT,
   USER,

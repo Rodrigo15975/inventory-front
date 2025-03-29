@@ -1,6 +1,6 @@
 import { useToast } from '@/hooks/use-toast'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createProduct, updateProduct } from './api.service'
+import { createProduct, deleteProduct, updateProduct } from './api.service'
 import { CreateProduct, UpdateProduct } from '../types/type.product'
 import { AxiosError } from 'axios'
 
@@ -45,7 +45,30 @@ export const useUpdateProduct = () => {
       toast({
         title: 'Product',
         variant: 'destructive',
-        description: description || 'Error al crear la categoría',
+        description: description || 'Error al actualizar la categoría',
+      })
+    },
+  })
+}
+export const useDeleteProduct = () => {
+  const queryClient = useQueryClient()
+  const { toast } = useToast()
+  return useMutation({
+    mutationKey: ['delete-product'],
+    mutationFn: (id: string) => deleteProduct(id),
+    onSuccess: async (newData) => {
+      const { message: description } = newData
+      await queryClient.invalidateQueries({ queryKey: ['products'] })
+      toast({ title: 'Producto', description })
+    },
+    onError: (error: AxiosError) => {
+      const { message: description } = error.response?.data as {
+        message: string
+      }
+      toast({
+        title: 'Product',
+        variant: 'destructive',
+        description: description || 'Error al eliminar la categoría',
       })
     },
   })
