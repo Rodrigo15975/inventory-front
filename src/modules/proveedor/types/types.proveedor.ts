@@ -10,7 +10,7 @@ export type Provider = {
     businessName: string
     legalRepresentative: string
     address: string
-  }
+  }[]
   status: number
 }
 
