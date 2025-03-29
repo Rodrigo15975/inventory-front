@@ -49,17 +49,9 @@ export function ProveedorForm() {
 
   const handledDelete = (id: string) => deleteProvider(id)
 
-  const handledEdit = (provider: Provider) => {
-    const {
-      proveedor: {
-        address,
-        corporate_reason,
-        legalRepresentative,
-        ruc,
-        phone,
-        id,
-      },
-    } = provider
+  const handledEdit = (provider: Provider['proveedor'][number]) => {
+    const { address, corporate_reason, legalRepresentative, ruc, phone, id } =
+      provider
     form.reset({
       address,
       numberRuc: ruc,
@@ -206,10 +198,7 @@ export function ProveedorForm() {
 
               <div className="space-x-2 flex">
                 <Button
-                  disabled={
-                    btnDisabled ||
-                    (!!proveedor?.proveedor && !editingProviderId)
-                  }
+                  disabled={btnDisabled}
                   type="submit"
                   className="w-full bg-blue-500"
                 >
@@ -226,7 +215,7 @@ export function ProveedorForm() {
         </CardContent>
       </Card>
 
-      <div>
+      <div className="space-y-4 ">
         <h2 className="text-xl font-semibold mb-4">Datos del Proveedor</h2>
         {isLoadingProvider ? (
           <Card className="overflow-hidden">
@@ -246,12 +235,14 @@ export function ProveedorForm() {
             </CardContent>
           </Card>
         ) : proveedor?.proveedor ? (
-          <ProveedorCard
-            btnDisabled={btnDisabled}
-            providerDelete={handledDelete}
-            providerEdit={handledEdit}
-            proveedor={proveedor}
-          />
+          <>
+            <ProveedorCard
+              btnDisabled={btnDisabled}
+              providerDelete={handledDelete}
+              providerEdit={handledEdit}
+              proveedor={proveedor}
+            />
+          </>
         ) : (
           <Card className="overflow-hidden">
             <CardHeader className="bg-primary/5">
