@@ -9,11 +9,9 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
-  SelectItem,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
@@ -22,70 +20,15 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import {
-  useGetAllMovements,
-  useGetAllMovementsActives,
-} from '../../services/queriess.service'
-
-const formSchema = z.object({
-  typePresentationId: z.string().min(1, 'La presentación es requerida'),
-  categoryId: z.string().min(1, 'La categoría es requerida'),
-  typeProductId: z.string().min(1, 'El tipo de producto es requerido'),
-  movementTypeId: z.string().min(1, 'El tipo de movimiento es requerido'),
-  productId: z.string().min(1, 'El producto es requerido'),
-  entry: z.number().optional(),
-  exit: z.number().optional(),
-  description: z.string().optional(),
-})
-
-const mockCategories = [
-  { id: '1', name: 'Categoría 1' },
-  { id: '2', name: 'Categoría 2' },
-  { id: '3', name: 'Categoría 3' },
-]
-
-const mockPresentations = [
-  { id: '1', name: 'Saco' },
-  { id: '2', name: 'Medio saco' },
-  { id: '3', name: 'Kilo' },
-]
-
-const mockTypes = [
-  { id: '1', name: 'Grano' },
-  { id: '2', name: 'Polvo' },
-  { id: '3', name: 'Mazorca' },
-]
-
-const mockMovementTypes = [
-  { id: '1', name: 'Entrada' },
-  { id: '2', name: 'Salida' },
-]
-
-const mockProducts = [
-  { id: '1', name: 'Producto 1' },
-  { id: '2', name: 'Producto 2' },
-  { id: '3', name: 'Producto 3' },
-]
+import { formSchema, valuesInitials } from './schema/schema'
 
 const FormularioMovements = () => {
-  const { data: movements = [] } = useGetAllMovementsActives()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      typePresentationId: '',
-      categoryId: '',
-      typeProductId: '',
-      movementTypeId: '',
-      productId: '',
-      description: '',
-    },
+    defaultValues: valuesInitials,
   })
 
-  const movementTypeId = form.watch('movementTypeId')
-  const isEntryMovement = movementTypeId === '1'
-  const isExitMovement = movementTypeId === '2'
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
     console.log(values)
     form.reset()
   }
@@ -120,13 +63,7 @@ const FormularioMovements = () => {
                             <SelectValue placeholder="Seleccionar producto" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
-                          {movements.map(({ idMovement, productName }) => (
-                            <SelectItem key={idMovement} value={idMovement}>
-                              {productName}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
+                        <SelectContent></SelectContent>
                       </Select>
                       <FormMessage />
                     </FormItem>
@@ -149,11 +86,11 @@ const FormularioMovements = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {mockCategories.map((category) => (
+                          {/* {mockCategories.map((category) => (
                             <SelectItem key={category.id} value={category.id}>
                               {category.name}
                             </SelectItem>
-                          ))}
+                          ))} */}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -177,14 +114,14 @@ const FormularioMovements = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {mockPresentations.map((presentation) => (
+                          {/* {mockPresentations.map((presentation) => (
                             <SelectItem
                               key={presentation.id}
                               value={presentation.id}
                             >
                               {presentation.name}
                             </SelectItem>
-                          ))}
+                          ))} */}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -208,11 +145,11 @@ const FormularioMovements = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {mockTypes.map((type) => (
+                          {/* {mockTypes.map((type) => (
                             <SelectItem key={type.id} value={type.id}>
                               {type.name}
                             </SelectItem>
-                          ))}
+                          ))} */}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -236,71 +173,17 @@ const FormularioMovements = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {mockMovementTypes.map((type) => (
+                          {/* {mockMovementTypes.map((type) => (
                             <SelectItem key={type.id} value={type.id}>
                               {type.name}
                             </SelectItem>
-                          ))}
+                          ))} */}
                         </SelectContent>
                       </Select>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-
-                {isEntryMovement && (
-                  <FormField
-                    control={form.control}
-                    name="entry"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Entrada</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="Cantidad de entrada"
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(
-                                e.target.value
-                                  ? Number(e.target.value)
-                                  : undefined
-                              )
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
-
-                {isExitMovement && (
-                  <FormField
-                    control={form.control}
-                    name="exit"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Salida</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="Cantidad de salida"
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(
-                                e.target.value
-                                  ? Number(e.target.value)
-                                  : undefined
-                              )
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
 
                 <FormField
                   control={form.control}
