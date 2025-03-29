@@ -106,6 +106,9 @@ export function AddProductForm() {
                 render={({ field }) => (
                   <FormItem className="space-y-2 text-start">
                     <Label htmlFor="category">Categoría</Label>
+                    <Label className="text-xs text-[#10B981] ml-2">
+                      (Solo categorias activas)
+                    </Label>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>

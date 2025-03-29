@@ -29,6 +29,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { useGetAllProducts } from '../../services/queries.service'
 import { SkeletonTableGlobal } from '@/components/ui/skeleton.table'
 import { useDataUpdateProduct } from '../../hooks/useDataUpdateProduct'
+import { useDeleteProduct } from '../../services/mutation.service'
 
 export function ProductTable() {
   const [page, setPage] = useState<number>(1)
@@ -38,7 +39,9 @@ export function ProductTable() {
     page,
     size
   )
-
+  const { mutate: deleteProduct, isPending: isLoadingDelete } =
+    useDeleteProduct()
+  const disabledBtn = isLoadingDelete
   const totalPages = Math.ceil((products?.count || 0) / size)
 
   const handleNextPage = () => {
@@ -64,7 +67,7 @@ export function ProductTable() {
       is_active: String(product?.is_active),
     })
   }
-  const handledDelete = (id: string) => {}
+  const handledDelete = (id: string) => deleteProduct(id)
 
   return (
     <Card className="rounded-md shadow-sm">
@@ -145,12 +148,14 @@ export function ProductTable() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
+                            disabled={disabledBtn}
                             onClick={() => handledEdit(product.id)}
                           >
                             <Edit2 />
                             Editar
                           </DropdownMenuItem>
                           <DropdownMenuItem
+                            disabled={disabledBtn}
                             onClick={() => handledDelete(product.id)}
                           >
                             <Trash /> Eliminar
