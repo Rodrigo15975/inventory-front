@@ -13,6 +13,7 @@ export const useCreateProduct = () => {
     onSuccess: async (newData) => {
       const { message: description } = newData
       await queryClient.invalidateQueries({ queryKey: ['products'] })
+      await queryClient.invalidateQueries({ queryKey: ['movements'] })
       toast({ title: 'Producto', description })
     },
     onError: (error: AxiosError) => {
@@ -36,6 +37,7 @@ export const useUpdateProduct = () => {
     onSuccess: async (newData) => {
       const { message: description } = newData
       await queryClient.invalidateQueries({ queryKey: ['products'] })
+      await queryClient.invalidateQueries({ queryKey: ['movements'] })
       toast({ title: 'Producto', description })
     },
     onError: (error: AxiosError) => {
@@ -59,7 +61,11 @@ export const useDeleteProduct = () => {
     onSuccess: async (newData) => {
       const { message: description } = newData
       await queryClient.invalidateQueries({ queryKey: ['products'] })
-      toast({ title: 'Producto', description })
+      await queryClient.invalidateQueries({ queryKey: ['movements'] })
+      toast({
+        title: 'Producto',
+        description: description || 'Error al eliminar el producto',
+      })
     },
     onError: (error: AxiosError) => {
       const { message: description } = error.response?.data as {
