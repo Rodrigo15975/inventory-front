@@ -1,6 +1,9 @@
-export type MovementsActives = {
-  idMovement: string
-  productName: string
+import { z } from 'zod'
+import { formSchema } from '../components/form/schema/schema'
+
+export interface TypeMovements {
+  id: string
+  name: string
 }
 
 export interface Movements {
@@ -25,24 +28,28 @@ export interface Movements {
       availableQuantity: number
       is_active: boolean
       description: string
-    }
-    category: {
-      id: string
-      name: string
+      category: {
+        id: string
+        name: string
+        description: string
+        is_active: string
+      }
+      TypePresentation: {
+        id: string
+        name: string
+      }
+      typeProduct: {
+        id: string
+        name: string
+      }
     }
     moventType: {
       id: string
       name: string
     }
-    TypePresentation: {
-      id: string
-      name: string
-    }
-    typeProduct: {
-      id: string
-      name: string
-    }
   }[]
 }
+
+export type CreateMovement = z.infer<typeof formSchema>
 
 export type MovementItem = Movements['data'][0]

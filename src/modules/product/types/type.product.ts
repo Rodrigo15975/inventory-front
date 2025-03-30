@@ -26,6 +26,35 @@ export type GetAllProducts = {
   status: number
 }
 
+export interface GetAllProductsActives {
+  data: {
+    id: string
+    name: string
+    availableQuantity: 0
+    is_active: true
+    description: null
+    updatedAt: string | Date
+    createdAt: string | Date
+    category: {
+      id: string
+      name: string
+      is_active: false
+      description: string
+    }
+    movements: {
+      balance: number
+    }[]
+    TypePresentation: {
+      id: string
+      name: string
+    }
+    typeProduct: {
+      id: string
+      name: string
+    }
+  }[]
+}
+
 export interface ProductFormValues {
   name: string
   categoryId: string

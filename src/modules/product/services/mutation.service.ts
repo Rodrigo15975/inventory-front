@@ -12,8 +12,11 @@ export const useCreateProduct = () => {
     mutationFn: (data: CreateProduct) => createProduct(data),
     onSuccess: async (newData) => {
       const { message: description } = newData
-      await queryClient.invalidateQueries({ queryKey: ['products'] })
-      await queryClient.invalidateQueries({ queryKey: ['movements'] })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['products'] }),
+        queryClient.invalidateQueries({ queryKey: ['movements'] }),
+        queryClient.invalidateQueries({ queryKey: ['products-actives'] }),
+      ])
       toast({ title: 'Producto', description })
     },
     onError: (error: AxiosError) => {
@@ -36,8 +39,11 @@ export const useUpdateProduct = () => {
     mutationFn: (data: UpdateProduct) => updateProduct(data),
     onSuccess: async (newData) => {
       const { message: description } = newData
-      await queryClient.invalidateQueries({ queryKey: ['products'] })
-      await queryClient.invalidateQueries({ queryKey: ['movements'] })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['products'] }),
+        queryClient.invalidateQueries({ queryKey: ['movements'] }),
+        queryClient.invalidateQueries({ queryKey: ['products-actives'] }),
+      ])
       toast({ title: 'Producto', description })
     },
     onError: (error: AxiosError) => {
@@ -60,8 +66,11 @@ export const useDeleteProduct = () => {
     mutationFn: (id: string) => deleteProduct(id),
     onSuccess: async (newData) => {
       const { message: description } = newData
-      await queryClient.invalidateQueries({ queryKey: ['products'] })
-      await queryClient.invalidateQueries({ queryKey: ['movements'] })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['products'] }),
+        queryClient.invalidateQueries({ queryKey: ['movements'] }),
+        queryClient.invalidateQueries({ queryKey: ['products-actives'] }),
+      ])
       toast({
         title: 'Producto',
         description: description || 'Error al eliminar el producto',
