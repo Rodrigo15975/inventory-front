@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PlusIcon } from 'lucide-react'
+import { Loader2Icon, PlusIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { formSchema, valuesInitials } from './schema/schema'
@@ -33,6 +33,7 @@ const FormularioMovements = () => {
   const { data: typeMovements } = useGetAllTypeMovements()
   const { mutate: createMovement, isPending: isPendingCreateMovement } =
     useCreateMovements()
+  const [restBalance, setRestBalance] = useState<number | null>(null)
   const [movementName, setMovementName] = useState<string>('')
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -43,6 +44,10 @@ const FormularioMovements = () => {
     const productId = form.watch('productId')
     const product = productsActives?.data.find((p) => p.id === productId)
     if (product) {
+      if (product.movements.length > 0)
+        setRestBalance(product.movements[0].balance)
+      else setRestBalance(null)
+
       form.setValue('typePresentationId', product.TypePresentation.name)
       form.setValue('categoryId', product.category.name)
       form.setValue('typeProductId', product.typeProduct.name)
@@ -50,12 +55,19 @@ const FormularioMovements = () => {
   }, [form.watch('productId'), productsActives])
 
   const onSubmit = (values: CreateMovement) => {
-    createMovement(values, {
-      onSuccess: () => {
-        form.reset()
-        setMovementName('')
+    createMovement(
+      {
+        ...values,
+        entry: movementName === 'ENTRADA' ? values.entry : undefined,
+        exit: movementName === 'SALIDA' ? values.exit : undefined,
       },
-    })
+      {
+        onSuccess: () => {
+          form.reset()
+          setMovementName('')
+        },
+      }
+    )
   }
 
   return (
@@ -144,10 +156,13 @@ const FormularioMovements = () => {
                       onValueChange={(v) => {
                         const movement = typeMovements?.find((m) => m.id === v)
                         setMovementName(movement?.name || '')
-                        if (movement?.name === 'ENTRADA')
-                          form.setValue('entry', '')
-                        else if (movement?.name === 'SALIDA')
-                          form.setValue('exit', '')
+                        if (movement?.name === 'ENTRADA') {
+                          form.setValue('entry', '0')
+                          form.setValue('exit', '0')
+                        } else if (movement?.name === 'SALIDA') {
+                          form.setValue('exit', '0')
+                          form.setValue('entry', '0')
+                        }
                         field.onChange(v)
                       }}
                       value={field.value}
@@ -178,6 +193,15 @@ const FormularioMovements = () => {
                       <FormLabel>
                         {movementName === 'ENTRADA' ? 'Entrada' : 'Salida'}
                       </FormLabel>
+                      {restBalance && (
+                        <FormLabel className=" ml-2 text-sm text-primary/50 ">
+                          (Balance restante -{' '}
+                          <span className="font-bold text-primary ">
+                            {restBalance}
+                          </span>
+                          )
+                        </FormLabel>
+                      )}
                       <FormControl>
                         <Input
                           {...field}
@@ -222,9 +246,14 @@ const FormularioMovements = () => {
             </div>
 
             <div className="flex justify-end">
-              <Button className="bg-[#10b981]" type="submit">
+              <Button
+                disabled={btnDisabled}
+                className="bg-[#10b981]"
+                type="submit"
+              >
                 <PlusIcon />
                 Agregar
+                {btnDisabled && <Loader2Icon />}
               </Button>
             </div>
           </form>

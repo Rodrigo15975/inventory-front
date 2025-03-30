@@ -5,8 +5,18 @@ export const formSchema = z.object({
   typeProductId: z.string().min(1, 'El tipo de producto es requerido'),
   movementTypeId: z.string().min(1, 'El tipo de movimiento es requerido'),
   productId: z.string().min(1, 'El producto es requerido'),
-  entry: z.string().optional().nullable(),
-  exit: z.string().optional().nullable(),
+  entry: z
+    .string()
+    .min(1, {
+      message: 'Cantidad requerida',
+    })
+    .optional(),
+  exit: z
+    .string()
+    .min(1, {
+      message: 'Cantidad requerida',
+    })
+    .optional(),
   description: z.string().optional(),
 })
 
@@ -16,7 +26,7 @@ export const valuesInitials: z.infer<typeof formSchema> = {
   typeProductId: '',
   movementTypeId: '',
   productId: '',
-  entry: null,
-  exit: null,
+  entry: '',
+  exit: '',
   description: '',
 }
