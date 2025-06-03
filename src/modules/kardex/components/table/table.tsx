@@ -30,28 +30,39 @@ import { es } from 'date-fns/locale'
 import { CalendarIcon, ChevronRight } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useGetAllMovements } from '../../services/queriess.service'
-import { Movements } from '../../types/kardex.types'
 import FormularioMovements from '../form/form'
+import { Input } from '@/components/ui/input'
+import { useDebounce } from '@/hooks/debounse'
 
 export default function ProductManagementPage() {
   const [page, setPage] = useState<number>(1)
   const [size, setSize] = useState<number>(30)
-  const { data, isLoading } = useGetAllMovements(page, size)
   const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined)
-  const totalPages = Math.ceil((data?.count || 0) / size)
+  const [searchTerm, setSearchTerm] = useState('')
+  const debouncedSearch = useDebounce(searchTerm, 800)
+  const formattedDate = useMemo(() => {
+    if (!dateFilter) return { startDate: undefined, endDate: undefined }
 
-  const filteredData = useMemo(() => {
-    if (!data || !dateFilter) return data
-    const filterDate = dateFilter.toISOString().split('T')[0]
-    const filtered = {
-      ...data,
-      data: data.data.filter((item) => {
-        const itemDate = new Date(item.createdAt).toISOString().split('T')[0]
-        return itemDate === filterDate
-      }),
+    const start = new Date(dateFilter)
+    start.setHours(0, 0, 0, 0)
+
+    const end = new Date(dateFilter)
+    end.setHours(23, 59, 59, 999)
+
+    return {
+      startDate: start.toISOString().split('T')[0],
+      endDate: end.toISOString().split('T')[0],
     }
-    return filtered
-  }, [data, dateFilter])
+  }, [dateFilter])
+
+  const { data: filteredData, isLoading } = useGetAllMovements(
+    page,
+    size,
+    debouncedSearch,
+    formattedDate.endDate,
+    undefined
+  )
+  const totalPages = Math.ceil((filteredData?.count || 0) / size)
 
   const handleNextPage = () => {
     if (page < totalPages) setPage((prev) => prev + 1)
@@ -69,8 +80,19 @@ export default function ProductManagementPage() {
             <div className="flex justify-between items-center mb-4">
               <div className="text-xl font-semibold">
                 Listado de movimientos
+                <span className="text-muted-foreground">
+                  ({filteredData?.count || 0})
+                </span>
               </div>
               <div className="flex items-center gap-2">
+                <div>
+                  <Input
+                    type="search"
+                    placeholder="Buscar por producto..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -87,7 +109,10 @@ export default function ProductManagementPage() {
                     <Calendar
                       mode="single"
                       selected={dateFilter}
-                      onSelect={setDateFilter}
+                      onSelect={(date) => {
+                        setPage(1)
+                        setDateFilter(date)
+                      }}
                       initialFocus
                     />
                     {dateFilter && (
@@ -256,30 +281,6 @@ export default function ProductManagementPage() {
                             )}
                           </TableCell>
                           <TableCell>{item.balance}</TableCell>
-                          {/* <TableCell className="text-right">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                  <MoreVertical className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent
-                                onClick={() => handledEntry(item)}
-                                align="end"
-                              >
-                                <DropdownMenuItem>
-                                  <ArrowRight />
-                                  Entrada
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => handledExit(item)}
-                                >
-                                  <ArrowLeftToLine />
-                                  Salida
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </TableCell> */}
                         </TableRow>
                       ))}
                     </TableBody>
@@ -325,7 +326,7 @@ export default function ProductManagementPage() {
                         variant="ghost"
                         size="icon"
                         onClick={handleNextPage}
-                        disabled={page >= totalPages}
+                        disabled={page === totalPages}
                       >
                         <ChevronRight className="h-4 w-4" />
                       </Button>
